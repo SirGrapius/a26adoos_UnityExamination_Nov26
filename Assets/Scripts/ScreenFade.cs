@@ -17,7 +17,7 @@ public class ScreenFade : MonoBehaviour
 
     public IEnumerator FadeIn(float duration)
     {
-        Color startColor = new Color(renderer.color.r, renderer.color.g, renderer.color.b, 255);
+        Color startColor = new Color(renderer.color.r, renderer.color.g, renderer.color.b, 1);
         Color targetColor = new Color(renderer.color.r, renderer.color.g, renderer.color.b, 0);
         StartCoroutine(Fade(startColor, targetColor, duration));
         yield return new WaitForSeconds(duration);
@@ -26,7 +26,7 @@ public class ScreenFade : MonoBehaviour
     public IEnumerator FadeOut(float duration)
     {
         Color startColor = new Color(renderer.color.r, renderer.color.g, renderer.color.b, 0);
-        Color targetColor = new Color(renderer.color.r, renderer.color.g, renderer.color.b, 255);
+        Color targetColor = new Color(renderer.color.r, renderer.color.g, renderer.color.b, 1);
         StartCoroutine(Fade(startColor, targetColor, duration));
         yield return new WaitForSeconds(duration);
     }

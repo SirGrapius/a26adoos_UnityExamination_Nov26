@@ -25,7 +25,10 @@ public class LimitedPlatformerMovement : MonoBehaviour
     [SerializeField] private int groundLayer;
     
     private Vector2 moveInput;
-    private bool jumpInput;
+    private bool jumpInput; 
+    public bool inDialogue;
+    public bool hasGem;
+    [SerializeField] private NPC currentNPC;
     
     private Rigidbody2D rb;
     private SpriteRenderer renderer;
@@ -44,7 +47,15 @@ public class LimitedPlatformerMovement : MonoBehaviour
     void Update()
     {
         // Apply horizontal velocity from input
-        rb.linearVelocityX = moveInput.x * maxSpeed;
+        if (!inDialogue)
+        {
+            rb.linearVelocityX = moveInput.x * maxSpeed;
+        }
+        
+        if (Keyboard.current[Key.E].wasPressedThisFrame && !inDialogue && currentNPC != null)
+        {
+            currentNPC.StartDialogue();
+        }
 
         if (rb.linearVelocityX != 0)
         {
@@ -110,5 +121,21 @@ public class LimitedPlatformerMovement : MonoBehaviour
     public void OnJump(InputValue input)
     {
         jumpInput = true;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("NPC"))
+        {
+            currentNPC = other.gameObject.GetComponent<NPC>();
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("NPC"))
+        {
+            currentNPC = null;
+        }
     }
 }
