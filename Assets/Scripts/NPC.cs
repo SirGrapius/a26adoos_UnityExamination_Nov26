@@ -27,6 +27,7 @@ public class NPC : MonoBehaviour
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         interactText = GetComponentInChildren<TextMeshPro>();
         dialogueBox = GameObject.FindGameObjectWithTag("DialogueBox").GetComponent<TextMeshPro>();
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<LimitedPlatformerMovement>();
         interactText.gameObject.SetActive(false);
         dialogueBox.gameObject.SetActive(false);
     }
@@ -34,12 +35,15 @@ public class NPC : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (player.inDialogue && !dialogueCooldown && Keyboard.current[Key.E].isPressed)
+        if (player.inDialogue && !dialogueCooldown && Keyboard.current[Key.E].wasPressedThisFrame)
         {
             dialogueIndex++;
         }
-        
-        dialogueBox.text = currentDialogues[dialogueIndex];
+
+        if (dialogueBox.gameObject.activeInHierarchy)
+        {
+            dialogueBox.text = currentDialogues[dialogueIndex];
+        }
 
         if (dialogueIndex >= currentDialogues.Count - 1)
         {
@@ -101,7 +105,6 @@ public class NPC : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            player = null;
             interactText.gameObject.SetActive(false);
         }
     }

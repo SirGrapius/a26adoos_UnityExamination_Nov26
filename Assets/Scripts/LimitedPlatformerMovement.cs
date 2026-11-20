@@ -1,8 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Collections;
+using TMPro;
 using UnityEngine;
+using Unity.UIElements;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
-            /////////////// INFORMATION ///////////////
+/////////////// INFORMATION ///////////////
 // SETUP:
 // Add the script to the object you want the player to control
 
@@ -23,15 +28,22 @@ public class LimitedPlatformerMovement : MonoBehaviour
     [SerializeField] private float maxSpeed = 10f;
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private int groundLayer;
+
+    [SerializeField] private int maxHealth = 10;
+    [SerializeField] private int currentHealth;
+    [SerializeField] private TextMeshPro healthText;
+    public bool invincible;
     
     private Vector2 moveInput;
     private bool jumpInput; 
     public bool inDialogue;
     public bool hasGem;
     [SerializeField] private NPC currentNPC;
+    private Vector3 originalPos;
     
     private Rigidbody2D rb;
     private SpriteRenderer renderer;
+    private ScreenFade fader;
     private Animator anim;
     [SerializeField] private CapsuleCollider2D groundCheckCollider; 
 
@@ -39,13 +51,17 @@ public class LimitedPlatformerMovement : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        fader = GameObject.FindGameObjectWithTag("ScreenFade").GetComponent<ScreenFade>();
         anim = GetComponentInChildren<Animator>();
         renderer = GetComponentInChildren<SpriteRenderer>();
         groundCheckCollider = GetComponent<CapsuleCollider2D>();
+        originalPos = transform.position;
+        currentHealth  = maxHealth;
     }
     
     void Update()
     {
+        healthText.text = "Health: " + currentHealth;
         // Apply horizontal velocity from input
         if (!inDialogue)
         {
@@ -98,6 +114,28 @@ public class LimitedPlatformerMovement : MonoBehaviour
         {
             renderer.flipX = false;
         }
+    }
+
+    public IEnumerator TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+        if (currentHealth <= 0)
+        {
+            StartCoroutine(Die());
+        }
+        invincible = true;
+        yield return new WaitForSeconds(0.1f);
+        invincible = false;
+    }
+
+    public IEnumerator Die()
+    {
+        currentHealth = maxHealth;
+        inDialogue = true;
+        StartCoroutine(fader.FadeInAndOut(3));
+        yield return new WaitForSeconds(1.5f);
+        transform.position = originalPos;
+        inDialogue = false;
     }
 
     private bool IsGrounded()
