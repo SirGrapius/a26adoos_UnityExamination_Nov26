@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -21,19 +22,22 @@ public class LimitedPlatformerMovement : MonoBehaviour
 {
     [SerializeField] private float maxSpeed = 10f;
     [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private int groundLayer;
     
     private Vector2 moveInput;
     private bool jumpInput;
     
     private Rigidbody2D rb;
+    private SpriteRenderer renderer;
     private Animator anim;
-    private CapsuleCollider2D groundCheckCollider; 
+    [SerializeField] private CapsuleCollider2D groundCheckCollider; 
 
     
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<Animator>();
+        renderer = GetComponentInChildren<SpriteRenderer>();
         groundCheckCollider = GetComponent<CapsuleCollider2D>();
     }
     
@@ -42,13 +46,21 @@ public class LimitedPlatformerMovement : MonoBehaviour
         // Apply horizontal velocity from input
         rb.linearVelocityX = moveInput.x * maxSpeed;
 
-        if (rb.linearVelocity.x != 0)
+        if (rb.linearVelocityX != 0)
         {
             anim.SetBool("Walking", true);
         }
         else
         {
             anim.SetBool("Walking", false);
+        }
+        
+        anim.SetBool("Grounded", IsGrounded());
+
+        if (IsGrounded())
+        {
+            anim.SetBool("Jumping", false);
+            anim.SetBool("Falling", false);
         }
 
         if (rb.linearVelocity.y < 0)
@@ -65,18 +77,27 @@ public class LimitedPlatformerMovement : MonoBehaviour
         jumpInput = false; // only jump once for each press of the jump-button
     }
 
+    private void FixedUpdate()
+    {
+        if (rb.linearVelocityX < 0)
+        {
+            renderer.flipX = true;
+        }
+        else if (rb.linearVelocityX > 0)
+        {
+            renderer.flipX = false;
+        }
+    }
+
     private bool IsGrounded()
     {
         // Is our groundCheckCollider touching the groundLayer? If so, return the value "true"
-        if (groundCheckCollider.IsTouchingLayers(~0)) // ~0 is referring to EVERY layer.
+        if (groundCheckCollider.IsTouchingLayers(~0))
         {
-            anim.SetBool("Grounded", true);
-            anim.SetBool("Jumping", false);
             return true;
         }
         else
         {
-            anim.SetBool("Grounded", false);
             return false;
         }
     }
