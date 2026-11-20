@@ -167,6 +167,11 @@ public class LimitedPlatformerMovement : MonoBehaviour
         {
             currentNPC = other.gameObject.GetComponent<NPC>();
         }
+
+        if (other.CompareTag("Killbox"))
+        {
+            StartCoroutine(Die());
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
