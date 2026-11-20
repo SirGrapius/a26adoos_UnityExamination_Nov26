@@ -16,7 +16,7 @@ public class NPC : MonoBehaviour
     [SerializeField] private List<string> dialogues;
     [SerializeField] private List<string> victoryDialogues;
     [SerializeField] private List<string> currentDialogues;
-    private int dialogueIndex;
+    private int dialogueIndex = 0;
 
     private bool dialogueCooldown;
     
@@ -37,6 +37,7 @@ public class NPC : MonoBehaviour
     {
         if (player.inDialogue && !dialogueCooldown && Keyboard.current[Key.E].wasPressedThisFrame)
         {
+            StartCoroutine(Cooldown());
             dialogueIndex++;
         }
 
@@ -74,6 +75,7 @@ public class NPC : MonoBehaviour
         dialogueBox.gameObject.SetActive(true);
         player.inDialogue = true;
         dialogueBox.text = currentDialogues[dialogueIndex];
+        StartCoroutine(Cooldown());
     }
 
     private IEnumerator Cooldown()
