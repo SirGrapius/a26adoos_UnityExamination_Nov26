@@ -26,12 +26,14 @@ public class LimitedPlatformerMovement : MonoBehaviour
     private bool jumpInput;
     
     private Rigidbody2D rb;
+    private Animator anim;
     private CapsuleCollider2D groundCheckCollider; 
 
     
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponentInChildren<Animator>();
         groundCheckCollider = GetComponent<CapsuleCollider2D>();
     }
     
@@ -39,11 +41,26 @@ public class LimitedPlatformerMovement : MonoBehaviour
     {
         // Apply horizontal velocity from input
         rb.linearVelocityX = moveInput.x * maxSpeed;
+
+        if (rb.linearVelocity.x != 0)
+        {
+            anim.SetBool("Walking", true);
+        }
+        else
+        {
+            anim.SetBool("Walking", false);
+        }
+
+        if (rb.linearVelocity.y < 0)
+        {
+            anim.SetBool("Falling", true);
+        }
         
         // Apply vertical velocity from jump
         if (jumpInput && IsGrounded())
         {
             rb.linearVelocityY = jumpForce;
+            anim.SetBool("Jumping", true);
         }
         jumpInput = false; // only jump once for each press of the jump-button
     }
@@ -53,10 +70,13 @@ public class LimitedPlatformerMovement : MonoBehaviour
         // Is our groundCheckCollider touching the groundLayer? If so, return the value "true"
         if (groundCheckCollider.IsTouchingLayers(~0)) // ~0 is referring to EVERY layer.
         {
+            anim.SetBool("Grounded", true);
+            anim.SetBool("Jumping", false);
             return true;
         }
         else
         {
+            anim.SetBool("Grounded", false);
             return false;
         }
     }
