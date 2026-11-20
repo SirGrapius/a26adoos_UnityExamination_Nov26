@@ -13,15 +13,20 @@ public class SceneChangeHandler : MonoBehaviour
     private void Start()
     {
         fader = GetComponentInChildren<ScreenFade>();
+        StartCoroutine(fader.FadeIn(2));
     }
 
-    public void ChangeScene(string sceneName)
+    public IEnumerator ChangeScene(int sceneIndex)
     {
-        SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+        StartCoroutine(fader.FadeOut(2));
+        yield return new WaitForSeconds(2);
+        SceneManager.LoadScene(sceneIndex);
     }
 
-    public void QuitGame()
+    public IEnumerator QuitGame()
     {
+        StartCoroutine(fader.FadeOut(2));
+        yield return new WaitForSeconds(2);
         Application.Quit();
     }
 }
